@@ -1,10 +1,12 @@
 package com.example.brunodossantoscarvalhal.todo.Notes;
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import com.example.brunodossantoscarvalhal.todo.Notes.NoteListFragment.OnListFragmentInteractionListener;
@@ -49,6 +51,16 @@ public class NoteRecyclerViewAdapter extends RecyclerView.Adapter<NoteRecyclerVi
                 }
             }
         });
+
+        holder.checkBoxView.setOnCheckedChangeListener(
+                new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                        holder.mItem.setCompleted(b);
+                    }
+                }
+
+        );
     }
 
     @Override
