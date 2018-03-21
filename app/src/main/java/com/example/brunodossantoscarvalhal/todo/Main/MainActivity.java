@@ -3,6 +3,7 @@ package com.example.brunodossantoscarvalhal.todo.Main;
 import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
@@ -35,7 +36,7 @@ public class MainActivity extends AppCompatActivity implements NoteListFragment.
         setupActionBar();
         setupNavigationListener();
         setupFloatingActionButton();
-        setFragment(new MainFragment(), null, true);
+        setFragment(new NoteListFragment(), null, false);
     }
 
     @Override
@@ -49,6 +50,12 @@ public class MainActivity extends AppCompatActivity implements NoteListFragment.
         switch (item.getItemId()) {
             case android.R.id.home:
                 mDrawerLayout.openDrawer(GravityCompat.START);
+                return true;
+            case R.id.action_sun:
+                Snackbar.make(findViewById(R.id.fragment_container), R.string.sun, Snackbar.LENGTH_LONG).show();
+                return true;
+            case R.id.action_help:
+                setHelpFragment();
                 return true;
         }
         return super.onOptionsItemSelected(item);

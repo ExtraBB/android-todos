@@ -3,13 +3,13 @@
 
         <!-- "Mark Favorite", should appear as action button if possible -->
         <item
-            android:id="@+id/action_favorite"
+            android:id="@+id/action_sun"
             android:icon="@drawable/ic_brightness"
-            android:title="Money"
+            android:title="Sun"
             app:showAsAction="ifRoom"/>
 
         <!-- Settings, should always be in the overflow -->
-        <item android:id="@+id/action_settings"
+        <item android:id="@+id/action_help"
             android:title="Help"
             app:showAsAction="never"/>
 </menu>

@@ -74,7 +74,7 @@ public class EditActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if(titleEditText.getText().toString().equals("")) {
-                    Snackbar.make(findViewById(R.id.input_container), "Please enter a title", Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(findViewById(R.id.input_container), R.string.no_title, Snackbar.LENGTH_LONG).show();
                     return;
                 }
                 if (noteId != 0) {

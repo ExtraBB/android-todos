@@ -6,4 +6,6 @@
     <string name="main_title">Notes</string>
     <string name="title_hint">Title...</string>
     <string name="description_hint">Description...</string>
+    <string name="no_title">Please add a title.</string>
+    <string name="sun">Praise the sun!</string>
 </resources>
