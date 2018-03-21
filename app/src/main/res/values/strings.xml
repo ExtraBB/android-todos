@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Todo</string>
+    <string name="drawer_option_1">To-do List</string>
+    <string name="drawer_option_2">Help</string>
+    <string name="edit_title">Edit Note</string>
+    <string name="main_title">Notes</string>
+    <string name="title_hint">Title...</string>
+    <string name="description_hint">Description...</string>
+</resources>
