@@ -57,9 +57,8 @@ public class MainActivity extends AppCompatActivity implements NoteListFragment.
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        // Check which request we're responding to
         if (requestCode == EditActivity.EDIT_REQUEST_CODE) {
-            if (resultCode == EditActivity.EDIT_RESULT_OK) {
+            if (resultCode == EditActivity.EDIT_RESULT_OK || resultCode == EditActivity.EDIT_RESULT_DELETED) {
                 if (currentFragment instanceof NoteListFragment) {
                     ((NoteListFragment) currentFragment).refreshNotes();
                 } else {

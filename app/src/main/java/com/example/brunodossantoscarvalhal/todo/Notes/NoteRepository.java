@@ -55,6 +55,12 @@ public class NoteRepository {
         }
     }
 
+    public void deleteNote(int id) {
+        if(mNotes.containsKey(id)) {
+            mNotes.remove(id);
+        }
+    }
+
     public static NoteRepository getInstance() {
         if(_instance == null) {
             _instance = new NoteRepository();
