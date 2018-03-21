@@ -1,5 +1,6 @@
 package com.example.brunodossantoscarvalhal.todo.Notes;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -9,6 +10,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 
+import com.example.brunodossantoscarvalhal.todo.Main.MainActivity;
 import com.example.brunodossantoscarvalhal.todo.Notes.NoteListFragment.OnListFragmentInteractionListener;
 import com.example.brunodossantoscarvalhal.todo.R;
 
@@ -22,6 +24,7 @@ public class NoteRecyclerViewAdapter extends RecyclerView.Adapter<NoteRecyclerVi
 
     private final List<Note> mValues;
     private final OnListFragmentInteractionListener mListener;
+    private Context appContext;
 
     public NoteRecyclerViewAdapter(List<Note> items, OnListFragmentInteractionListener listener) {
         mValues = items;
@@ -32,14 +35,16 @@ public class NoteRecyclerViewAdapter extends RecyclerView.Adapter<NoteRecyclerVi
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.fragment_item, parent, false);
+
+        appContext = parent.getContext().getApplicationContext();
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
-        holder.checkBoxView.setChecked(mValues.get(position).getCompleted());
-        holder.titleView.setText(mValues.get(position).getTitle());
+        holder.checkBoxView.setChecked(holder.mItem.completed);
+        holder.titleView.setText(holder.mItem.title);
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -56,7 +61,8 @@ public class NoteRecyclerViewAdapter extends RecyclerView.Adapter<NoteRecyclerVi
                 new CompoundButton.OnCheckedChangeListener() {
                     @Override
                     public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                        holder.mItem.setCompleted(b);
+                        holder.mItem.completed = b;
+                        NoteRepository.getInstance(appContext).updateNote(holder.mItem);
                     }
                 }
 

@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements NoteListFragment.
         if (requestCode == EditActivity.EDIT_REQUEST_CODE) {
             if (resultCode == EditActivity.EDIT_RESULT_OK || resultCode == EditActivity.EDIT_RESULT_DELETED) {
                 if (currentFragment instanceof NoteListFragment) {
-                    ((NoteListFragment) currentFragment).refreshNotes();
+                    ((NoteListFragment) currentFragment).refreshNotes(getApplicationContext());
                 } else {
                     setNoteListFragment();
                 }
@@ -150,7 +150,7 @@ public class MainActivity extends AppCompatActivity implements NoteListFragment.
     @Override
     public void onListFragmentInteraction(Note item) {
         Intent intent = new Intent(MainActivity.this, EditActivity.class);
-        intent.putExtra(NoteRepository.ARG_NOTE_ID, item.getId());
+        intent.putExtra(NoteRepository.ARG_NOTE_ID, item.id);
         startActivityForResult(intent, EditActivity.EDIT_REQUEST_CODE);
     }
 }

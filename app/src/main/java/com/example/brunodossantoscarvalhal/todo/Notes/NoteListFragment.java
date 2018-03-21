@@ -56,7 +56,7 @@ public class NoteListFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new NoteRecyclerViewAdapter(NoteRepository.getInstance().getNotes(), mListener));
+            recyclerView.setAdapter(new NoteRecyclerViewAdapter(NoteRepository.getInstance(context.getApplicationContext()).getNotes(), mListener));
         }
         return view;
     }
@@ -79,8 +79,8 @@ public class NoteListFragment extends Fragment {
         mListener = null;
     }
 
-    public void refreshNotes() {
-        recyclerView.setAdapter(new NoteRecyclerViewAdapter(NoteRepository.getInstance().getNotes(), mListener));
+    public void refreshNotes(Context context){
+        recyclerView.setAdapter(new NoteRecyclerViewAdapter(NoteRepository.getInstance(context).getNotes(), mListener));
     }
 
     /**

@@ -1,7 +1,11 @@
 package com.example.brunodossantoscarvalhal.todo.Notes;
 
+import android.arch.persistence.room.Room;
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+
+import com.example.brunodossantoscarvalhal.todo.Main.AppDatabase;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -18,52 +22,32 @@ import java.util.Set;
 
 public class NoteRepository {
 
-    Map<Integer, Note> mNotes;
-    int idCounter = 1;
-
+    AppDatabase database;
     static NoteRepository _instance;
 
     public static final String ARG_NOTE_ID = "note_id";
 
-    public NoteRepository() {
-        mNotes = new HashMap<Integer, Note>();
-        addNote(new Note("Title 1", "Description 1"));
-        addNote(new Note("Title 2", "Description 2"));
-        addNote(new Note("Title 3", "Description 3"));
+    public NoteRepository(Context context) {
+        database = Room.databaseBuilder(context, AppDatabase.class, "notes-db").allowMainThreadQueries().build();
     }
 
     public List<Note> getNotes() {
-        return new ArrayList<Note>(mNotes.values());
+        return database.noteDao().loadNotes();
     }
 
     public Note getNoteById(int id) {
-        return mNotes.get(id);
+        return database.noteDao().loadNoteById(id);
     }
 
-    public void addNote(Note note) {
-        note.setId(idCounter);
-        mNotes.put(idCounter++, note);
-    }
+    public void addNote(Note note) { database.noteDao().insertNotes(note);}
 
-    public void editNote(int id, @Nullable String title, @Nullable String description) {
-        Note note = mNotes.get(id);
-        if(title != null) {
-            note.setTitle(title);
-        }
-        if(description != null) {
-            note.setDescription(description);
-        }
-    }
+    public void updateNote(Note note) { database.noteDao().updateNotes(note);}
 
-    public void deleteNote(int id) {
-        if(mNotes.containsKey(id)) {
-            mNotes.remove(id);
-        }
-    }
+    public void deleteNote(Note note) { database.noteDao().deleteNotes(note);}
 
-    public static NoteRepository getInstance() {
+    public static NoteRepository getInstance(Context context) {
         if(_instance == null) {
-            _instance = new NoteRepository();
+            _instance = new NoteRepository(context);
         }
         return _instance;
     }

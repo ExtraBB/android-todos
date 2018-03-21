@@ -28,7 +28,7 @@ public class EditActivity extends AppCompatActivity {
 
     EditText titleEditText;
     EditText descriptionEditText;
-    int noteId;
+    Note currentNote;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,18 +42,18 @@ public class EditActivity extends AppCompatActivity {
 
         Bundle bundle = getIntent().getExtras();
         if(bundle != null) {
-            noteId = bundle.getInt(NoteRepository.ARG_NOTE_ID);
+            int noteId = bundle.getInt(NoteRepository.ARG_NOTE_ID);
             if (noteId != 0) {
-                Note note = NoteRepository.getInstance().getNoteById(noteId);
-                titleEditText.setText(note.getTitle());
-                descriptionEditText.setText(note.getDescription());
+                currentNote = NoteRepository.getInstance(getApplicationContext()).getNoteById(noteId);
+                titleEditText.setText(currentNote.title);
+                descriptionEditText.setText(currentNote.description);
             }
         }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if(noteId != 0) {
+        if(currentNote != null) {
             getMenuInflater().inflate(R.menu.edit_menu, menu);
         }
         return true;
@@ -77,10 +77,12 @@ public class EditActivity extends AppCompatActivity {
                     Snackbar.make(findViewById(R.id.input_container), R.string.no_title, Snackbar.LENGTH_LONG).show();
                     return;
                 }
-                if (noteId != 0) {
-                    NoteRepository.getInstance().editNote(noteId, titleEditText.getText().toString(), descriptionEditText.getText().toString());
+                if (currentNote != null) {
+                    currentNote.title = titleEditText.getText().toString();
+                    currentNote.description = descriptionEditText.getText().toString();
+                    NoteRepository.getInstance(getApplicationContext()).updateNote(currentNote);
                 } else {
-                    NoteRepository.getInstance().addNote(new Note(titleEditText.getText().toString(), descriptionEditText.getText().toString()));
+                    NoteRepository.getInstance(getApplicationContext()).addNote(new Note(titleEditText.getText().toString(), descriptionEditText.getText().toString()));
                 }
                 setResult(EDIT_RESULT_OK);
                 finish();
@@ -96,7 +98,7 @@ public class EditActivity extends AppCompatActivity {
                 finish();
                 return true;
             case R.id.action_delete:
-                NoteRepository.getInstance().deleteNote(noteId);
+                NoteRepository.getInstance(getApplicationContext()).deleteNote(currentNote);
                 setResult(EDIT_RESULT_DELETED);
                 finish();
                 return true;
