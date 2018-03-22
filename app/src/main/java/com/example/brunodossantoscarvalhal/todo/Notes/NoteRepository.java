@@ -1,5 +1,7 @@
 package com.example.brunodossantoscarvalhal.todo.Notes;
 
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -31,7 +33,7 @@ public class NoteRepository {
         database = Room.databaseBuilder(context, AppDatabase.class, "notes-db").build();
     }
 
-    public List<Note> getNotes() {
+    public LiveData<List<Note>> getNotes() {
         return database.noteDao().loadNotes();
     }
 

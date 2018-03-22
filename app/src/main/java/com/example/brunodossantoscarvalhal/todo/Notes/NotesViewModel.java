@@ -15,7 +15,7 @@ import java.util.List;
 
 public class NotesViewModel extends ViewModel {
 
-    private MutableLiveData<List<Note>> mNotes = new MutableLiveData<List<Note>>();
+    private LiveData<List<Note>> mNotes;
     private NoteRepository mNoteRepository;
 
     public LiveData<List<Note>> getNotes() {
@@ -23,23 +23,9 @@ public class NotesViewModel extends ViewModel {
             mNoteRepository = NoteRepository.getInstance();
         }
         if (mNotes == null) {
-            mNotes = new MutableLiveData<List<Note>>();
-            refreshNotes();
+            mNotes = mNoteRepository.getNotes();
         }
         return mNotes;
-    }
-
-    public void refreshNotes() {
-        new AsyncTask<Void,Void,List<Note>>() {
-            @Override
-            protected List<Note> doInBackground(Void... voids) {
-                return mNoteRepository.getNotes();
-            }
-            @Override
-            protected void onPostExecute(List<Note> notes) {
-                mNotes.setValue(notes);
-            }
-        }.execute();
     }
 
     public void setNoteCompletion(Note note, boolean completion) {
@@ -49,10 +35,6 @@ public class NotesViewModel extends ViewModel {
             protected Boolean doInBackground(Note... notes) {
                 mNoteRepository.updateNotes(notes);
                 return true;
-            }
-            @Override
-            protected void onPostExecute(Boolean succeeded) {
-                refreshNotes();
             }
         }.execute(note);
     }

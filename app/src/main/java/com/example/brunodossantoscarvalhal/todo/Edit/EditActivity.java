@@ -34,50 +34,52 @@ public class EditActivity extends AppCompatActivity {
     EditText descriptionEditText;
 
     EditViewModel viewModel;
-    Note editingNote;
+    boolean editingExistingNote;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit);
-        setupActionBar();
-        setupFloatingActionButton();
 
         titleEditText = findViewById(R.id.title_edit);
         descriptionEditText = findViewById(R.id.description_edit);
 
+        setupActionBar();
+        setupFloatingActionButton();
+        setupViewModel();
+    }
 
-
+    private void setupViewModel() {
         Bundle bundle = getIntent().getExtras();
-        if(bundle != null) {
-            int noteId = bundle.getInt(NoteRepository.ARG_NOTE_ID, -1);
-            if (noteId != -1) {
-                viewModel = ViewModelProviders.of(this, new EditViewModelFactory(noteId)).get(EditViewModel.class);
-                viewModel.getNote().observe(this, new Observer<Note>() {
-                    @Override
-                    public void onChanged(@Nullable Note note) {
-                        editingNote = note;
-                        if(note != null) {
-                            titleEditText.setText(note.title);
-                            descriptionEditText.setText(note.description);
-                        } else {
-                            titleEditText.setText("");
-                            descriptionEditText.setText("");
-                        }
-                    }
-                });
-            } else {
-                viewModel = ViewModelProviders.of(this, new EditViewModelFactory(-1)).get(EditViewModel.class);
-            }
-        } else {
-            viewModel = ViewModelProviders.of(this, new EditViewModelFactory(-1)).get(EditViewModel.class);
+        int noteId = -1;
+        if (bundle != null) {
+            noteId = bundle.getInt(NoteRepository.ARG_NOTE_ID, -1);
         }
+
+        viewModel = ViewModelProviders.of(this, new EditViewModelFactory(noteId)).get(EditViewModel.class);
+        viewModel.getNote().observe(this, new Observer<Note>() {
+            @Override
+            public void onChanged(@Nullable Note note) {
+                editingExistingNote = note != null;
+                setFieldsToNote(note);
+            }
+        });
         viewModel.refreshNote();
+    }
+
+    private void setFieldsToNote(Note note) {
+        if (note != null) {
+            titleEditText.setText(note.title);
+            descriptionEditText.setText(note.description);
+        } else {
+            titleEditText.setText("");
+            descriptionEditText.setText("");
+        }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if(editingNote != null) {
+        if (editingExistingNote) {
             getMenuInflater().inflate(R.menu.edit_menu, menu);
         }
         return true;
@@ -97,16 +99,14 @@ public class EditActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(titleEditText.getText().toString().equals("")) {
+                if (titleEditText.getText().toString().equals("")) {
                     Snackbar.make(findViewById(R.id.input_container), R.string.no_title, Snackbar.LENGTH_LONG).show();
                     return;
                 }
-                if (editingNote != null) {
-                    editingNote.title = titleEditText.getText().toString();
-                    editingNote.description = descriptionEditText.getText().toString();
-                    viewModel.updateNote(editingNote);
+                if (editingExistingNote) {
+                    viewModel.updateNote(titleEditText.getText().toString(), descriptionEditText.getText().toString());
                 } else {
-                    viewModel.insertNote(new Note(titleEditText.getText().toString(), descriptionEditText.getText().toString()));
+                    viewModel.insertNote(titleEditText.getText().toString(), descriptionEditText.getText().toString());
                 }
                 setResult(EDIT_RESULT_OK);
                 finish();
@@ -122,7 +122,7 @@ public class EditActivity extends AppCompatActivity {
                 finish();
                 return true;
             case R.id.action_delete:
-                viewModel.deleteNote(editingNote);
+                viewModel.deleteNote();
                 setResult(EDIT_RESULT_DELETED);
                 finish();
                 return true;

@@ -30,6 +30,11 @@ public class NoteRecyclerViewAdapter extends RecyclerView.Adapter<NoteRecyclerVi
         mListener = listener;
     }
 
+    public void updateDataSet(List<Note> newData) {
+        this.mItems = newData;
+        notifyDataSetChanged();
+    }
+
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
@@ -54,19 +59,20 @@ public class NoteRecyclerViewAdapter extends RecyclerView.Adapter<NoteRecyclerVi
         });
 
         holder.checkBoxView.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-           @Override
+            @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 if (null != mListener) {
                     mListener.onListFragmentCheck(holder.mItem, b);
                 }
             }
-       }
-
-        );
+        });
     }
 
     @Override
     public int getItemCount() {
+        if(mItems == null) {
+            return 0;
+        }
         return mItems.size();
     }
 

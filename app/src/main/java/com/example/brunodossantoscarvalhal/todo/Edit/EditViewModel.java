@@ -17,7 +17,7 @@ import java.util.List;
 
 public class EditViewModel extends ViewModel {
 
-    private MutableLiveData<Note> mNote = new MutableLiveData<Note>();
+    private MutableLiveData<Note> mNote;
     private final int mNoteId;
     NoteRepository mNoteRepository;
 
@@ -50,7 +50,7 @@ public class EditViewModel extends ViewModel {
         }.execute(mNoteId);
     }
 
-    public void insertNote(Note note) {
+    public void insertNote(String title, String description) {
         new AsyncTask<Note,Void, Boolean>() {
             @Override
             protected Boolean doInBackground(Note... notes) {
@@ -61,10 +61,14 @@ public class EditViewModel extends ViewModel {
             protected void onPostExecute(Boolean succeeded) {
                 refreshNote();
             }
-        }.execute(note);
+        }.execute(new Note(title, description));
     }
 
-    public void updateNote(Note note) {
+    public void updateNote(String title, String description) {
+        Note note = mNote.getValue();
+        note.title = title;
+        note.description = description;
+
         new AsyncTask<Note,Void, Boolean>() {
             @Override
             protected Boolean doInBackground(Note... notes) {
@@ -78,7 +82,7 @@ public class EditViewModel extends ViewModel {
         }.execute(note);
     }
 
-    public void deleteNote(Note note) {
+    public void deleteNote() {
         new AsyncTask<Note,Void, Boolean>() {
             @Override
             protected Boolean doInBackground(Note... notes) {
@@ -89,6 +93,6 @@ public class EditViewModel extends ViewModel {
             protected void onPostExecute(Boolean succeeded) {
                 refreshNote();
             }
-        }.execute(note);
+        }.execute(mNote.getValue());
     }
 }

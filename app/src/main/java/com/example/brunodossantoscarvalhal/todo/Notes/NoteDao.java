@@ -1,5 +1,7 @@
 package com.example.brunodossantoscarvalhal.todo.Notes;
 
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
@@ -25,7 +27,7 @@ public interface NoteDao {
     public void deleteNotes(Note... notes);
 
     @Query("SELECT * FROM notes")
-    public List<Note> loadNotes();
+    public LiveData<List<Note>> loadNotes();
 
     @Query("SELECT * FROM notes WHERE id = :id LIMIT 1")
     public Note loadNoteById(int id);

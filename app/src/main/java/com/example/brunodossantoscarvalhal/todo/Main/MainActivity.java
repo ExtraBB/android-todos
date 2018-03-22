@@ -77,7 +77,6 @@ public class MainActivity extends AppCompatActivity implements NoteListFragment.
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == EditActivity.EDIT_REQUEST_CODE) {
             if (resultCode == EditActivity.EDIT_RESULT_OK || resultCode == EditActivity.EDIT_RESULT_DELETED) {
-                notesViewModel.refreshNotes();
                 if (!(currentFragment instanceof NoteListFragment)) {
                     setNoteListFragment();
                 }
