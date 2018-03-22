@@ -1,16 +1,22 @@
 package com.example.brunodossantoscarvalhal.todo.Notes;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.brunodossantoscarvalhal.todo.R;
+
+import java.util.List;
 
 /**
  * A fragment representing a list of Items.
@@ -24,6 +30,7 @@ public class NoteListFragment extends Fragment {
     private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
     private RecyclerView recyclerView;
+    private NotesViewModel viewModel;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -40,6 +47,14 @@ public class NoteListFragment extends Fragment {
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
         }
+
+        viewModel = ViewModelProviders.of(getActivity()).get(NotesViewModel.class);
+        viewModel.getNotes().observe(this, new Observer<List<Note>>() {
+            @Override
+            public void onChanged(@Nullable List<Note> notes) {
+                recyclerView.setAdapter(new NoteRecyclerViewAdapter(notes, mListener));
+            }
+        });
     }
 
     @Override
@@ -56,7 +71,7 @@ public class NoteListFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new NoteRecyclerViewAdapter(NoteRepository.getInstance(context.getApplicationContext()).getNotes(), mListener));
+            viewModel.refreshNotes();
         }
         return view;
     }
@@ -79,10 +94,6 @@ public class NoteListFragment extends Fragment {
         mListener = null;
     }
 
-    public void refreshNotes(Context context){
-        recyclerView.setAdapter(new NoteRecyclerViewAdapter(NoteRepository.getInstance(context).getNotes(), mListener));
-    }
-
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -90,6 +101,7 @@ public class NoteListFragment extends Fragment {
      * activity.
      */
     public interface OnListFragmentInteractionListener {
-        void onListFragmentInteraction(Note item);
+        void onListFragmentClick(Note item);
+        void onListFragmentCheck(Note item, boolean checked);
     }
 }

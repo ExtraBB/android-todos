@@ -28,7 +28,7 @@ public class NoteRepository {
     public static final String ARG_NOTE_ID = "note_id";
 
     public NoteRepository(Context context) {
-        database = Room.databaseBuilder(context, AppDatabase.class, "notes-db").allowMainThreadQueries().build();
+        database = Room.databaseBuilder(context, AppDatabase.class, "notes-db").build();
     }
 
     public List<Note> getNotes() {
@@ -39,16 +39,17 @@ public class NoteRepository {
         return database.noteDao().loadNoteById(id);
     }
 
-    public void addNote(Note note) { database.noteDao().insertNotes(note);}
+    public void insertNotes(Note... notes) { database.noteDao().insertNotes(notes);}
 
-    public void updateNote(Note note) { database.noteDao().updateNotes(note);}
+    public void updateNotes(Note... notes) { database.noteDao().updateNotes(notes);}
 
-    public void deleteNote(Note note) { database.noteDao().deleteNotes(note);}
+    public void deleteNotes(Note... notes) { database.noteDao().deleteNotes(notes);}
 
-    public static NoteRepository getInstance(Context context) {
-        if(_instance == null) {
-            _instance = new NoteRepository(context);
-        }
+    public static void InitializeInstance(Context context) {
+        _instance = new NoteRepository(context);
+    }
+
+    public static NoteRepository getInstance() {
         return _instance;
     }
 

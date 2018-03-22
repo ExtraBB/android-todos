@@ -1,6 +1,9 @@
 package com.example.brunodossantoscarvalhal.todo.Main;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -20,18 +23,26 @@ import android.view.View;
 import com.example.brunodossantoscarvalhal.todo.Edit.EditActivity;
 import com.example.brunodossantoscarvalhal.todo.Notes.Note;
 import com.example.brunodossantoscarvalhal.todo.Notes.NoteListFragment;
+import com.example.brunodossantoscarvalhal.todo.Notes.NoteRecyclerViewAdapter;
 import com.example.brunodossantoscarvalhal.todo.Notes.NoteRepository;
+import com.example.brunodossantoscarvalhal.todo.Notes.NotesViewModel;
 import com.example.brunodossantoscarvalhal.todo.R;
+
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements NoteListFragment.OnListFragmentInteractionListener {
 
     DrawerLayout mDrawerLayout;
     Fragment currentFragment;
+    NotesViewModel notesViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        NoteRepository.InitializeInstance(getApplicationContext());
+        notesViewModel = ViewModelProviders.of(this).get(NotesViewModel.class);
 
         setupActionBar();
         setupNavigationListener();
@@ -66,9 +77,8 @@ public class MainActivity extends AppCompatActivity implements NoteListFragment.
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == EditActivity.EDIT_REQUEST_CODE) {
             if (resultCode == EditActivity.EDIT_RESULT_OK || resultCode == EditActivity.EDIT_RESULT_DELETED) {
-                if (currentFragment instanceof NoteListFragment) {
-                    ((NoteListFragment) currentFragment).refreshNotes(getApplicationContext());
-                } else {
+                notesViewModel.refreshNotes();
+                if (!(currentFragment instanceof NoteListFragment)) {
                     setNoteListFragment();
                 }
             }
@@ -148,9 +158,14 @@ public class MainActivity extends AppCompatActivity implements NoteListFragment.
     }
 
     @Override
-    public void onListFragmentInteraction(Note item) {
+    public void onListFragmentClick(Note item) {
         Intent intent = new Intent(MainActivity.this, EditActivity.class);
         intent.putExtra(NoteRepository.ARG_NOTE_ID, item.id);
         startActivityForResult(intent, EditActivity.EDIT_REQUEST_CODE);
+    }
+
+    @Override
+    public void onListFragmentCheck(Note item, boolean checked) {
+        notesViewModel.setNoteCompletion(item, checked);
     }
 }

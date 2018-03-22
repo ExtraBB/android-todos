@@ -22,12 +22,11 @@ import java.util.List;
  */
 public class NoteRecyclerViewAdapter extends RecyclerView.Adapter<NoteRecyclerViewAdapter.ViewHolder> {
 
-    private final List<Note> mValues;
+    private List<Note> mItems;
     private final OnListFragmentInteractionListener mListener;
-    private Context appContext;
 
-    public NoteRecyclerViewAdapter(List<Note> items, OnListFragmentInteractionListener listener) {
-        mValues = items;
+    public NoteRecyclerViewAdapter(List<Note> notes, OnListFragmentInteractionListener listener) {
+        mItems = notes;
         mListener = listener;
     }
 
@@ -36,13 +35,12 @@ public class NoteRecyclerViewAdapter extends RecyclerView.Adapter<NoteRecyclerVi
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.fragment_item, parent, false);
 
-        appContext = parent.getContext().getApplicationContext();
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.mItem = mValues.get(position);
+        holder.mItem = mItems.get(position);
         holder.checkBoxView.setChecked(holder.mItem.completed);
         holder.titleView.setText(holder.mItem.title);
 
@@ -50,28 +48,26 @@ public class NoteRecyclerViewAdapter extends RecyclerView.Adapter<NoteRecyclerVi
             @Override
             public void onClick(View v) {
                 if (null != mListener) {
-                    // Notify the active callbacks interface (the activity, if the
-                    // fragment is attached to one) that an item has been selected.
-                    mListener.onListFragmentInteraction(holder.mItem);
+                    mListener.onListFragmentClick(holder.mItem);
                 }
             }
         });
 
-        holder.checkBoxView.setOnCheckedChangeListener(
-                new CompoundButton.OnCheckedChangeListener() {
-                    @Override
-                    public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                        holder.mItem.completed = b;
-                        NoteRepository.getInstance(appContext).updateNote(holder.mItem);
-                    }
+        holder.checkBoxView.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+           @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if (null != mListener) {
+                    mListener.onListFragmentCheck(holder.mItem, b);
                 }
+            }
+       }
 
         );
     }
 
     @Override
     public int getItemCount() {
-        return mValues.size();
+        return mItems.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

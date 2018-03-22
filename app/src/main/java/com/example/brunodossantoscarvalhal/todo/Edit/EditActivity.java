@@ -1,7 +1,10 @@
 package com.example.brunodossantoscarvalhal.todo.Edit;
 
 import android.app.Activity;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.NavUtils;
@@ -17,6 +20,7 @@ import android.widget.EditText;
 
 import com.example.brunodossantoscarvalhal.todo.Notes.Note;
 import com.example.brunodossantoscarvalhal.todo.Notes.NoteRepository;
+import com.example.brunodossantoscarvalhal.todo.Notes.NotesViewModel;
 import com.example.brunodossantoscarvalhal.todo.R;
 
 public class EditActivity extends AppCompatActivity {
@@ -28,7 +32,9 @@ public class EditActivity extends AppCompatActivity {
 
     EditText titleEditText;
     EditText descriptionEditText;
-    Note currentNote;
+
+    EditViewModel viewModel;
+    Note editingNote;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,20 +46,38 @@ public class EditActivity extends AppCompatActivity {
         titleEditText = findViewById(R.id.title_edit);
         descriptionEditText = findViewById(R.id.description_edit);
 
+
+
         Bundle bundle = getIntent().getExtras();
         if(bundle != null) {
-            int noteId = bundle.getInt(NoteRepository.ARG_NOTE_ID);
-            if (noteId != 0) {
-                currentNote = NoteRepository.getInstance(getApplicationContext()).getNoteById(noteId);
-                titleEditText.setText(currentNote.title);
-                descriptionEditText.setText(currentNote.description);
+            int noteId = bundle.getInt(NoteRepository.ARG_NOTE_ID, -1);
+            if (noteId != -1) {
+                viewModel = ViewModelProviders.of(this, new EditViewModelFactory(noteId)).get(EditViewModel.class);
+                viewModel.getNote().observe(this, new Observer<Note>() {
+                    @Override
+                    public void onChanged(@Nullable Note note) {
+                        editingNote = note;
+                        if(note != null) {
+                            titleEditText.setText(note.title);
+                            descriptionEditText.setText(note.description);
+                        } else {
+                            titleEditText.setText("");
+                            descriptionEditText.setText("");
+                        }
+                    }
+                });
+            } else {
+                viewModel = ViewModelProviders.of(this, new EditViewModelFactory(-1)).get(EditViewModel.class);
             }
+        } else {
+            viewModel = ViewModelProviders.of(this, new EditViewModelFactory(-1)).get(EditViewModel.class);
         }
+        viewModel.refreshNote();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if(currentNote != null) {
+        if(editingNote != null) {
             getMenuInflater().inflate(R.menu.edit_menu, menu);
         }
         return true;
@@ -77,12 +101,12 @@ public class EditActivity extends AppCompatActivity {
                     Snackbar.make(findViewById(R.id.input_container), R.string.no_title, Snackbar.LENGTH_LONG).show();
                     return;
                 }
-                if (currentNote != null) {
-                    currentNote.title = titleEditText.getText().toString();
-                    currentNote.description = descriptionEditText.getText().toString();
-                    NoteRepository.getInstance(getApplicationContext()).updateNote(currentNote);
+                if (editingNote != null) {
+                    editingNote.title = titleEditText.getText().toString();
+                    editingNote.description = descriptionEditText.getText().toString();
+                    viewModel.updateNote(editingNote);
                 } else {
-                    NoteRepository.getInstance(getApplicationContext()).addNote(new Note(titleEditText.getText().toString(), descriptionEditText.getText().toString()));
+                    viewModel.insertNote(new Note(titleEditText.getText().toString(), descriptionEditText.getText().toString()));
                 }
                 setResult(EDIT_RESULT_OK);
                 finish();
@@ -98,7 +122,7 @@ public class EditActivity extends AppCompatActivity {
                 finish();
                 return true;
             case R.id.action_delete:
-                NoteRepository.getInstance(getApplicationContext()).deleteNote(currentNote);
+                viewModel.deleteNote(editingNote);
                 setResult(EDIT_RESULT_DELETED);
                 finish();
                 return true;
