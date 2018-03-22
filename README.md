@@ -1,2 +1,2 @@
 # android-todos
-This is a simple todo app to play around with Android.
+This is a to-do app for Android using Architecture components, such as: ViewModel, LiveData and Room.
